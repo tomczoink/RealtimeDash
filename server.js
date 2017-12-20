@@ -24,21 +24,21 @@ var androidUsers = 100 - browserUsers - iPhoneUsers;
 /* Gets data and converts into JSON format. Could try getting it from Google Analytics for example */
 function getData() {
   activeUsers += Math.round((Math.random()*2-1));
-	var change = Math.round(2* ((Math.random()*2 - 1)));
+  var change = Math.round(2* ((Math.random()*2 - 1)));
 
-	/* Ensures fake percentages don't go beyond 100% */
-	if(browserUsers + change > 100 || browserUsers + change < 0) {
-		change *= -1;
-	} else if(iPhoneUsers - change > 100 || iPhoneUsers - change < 0) {
-		change *= -1;
-	}
+  /* Ensures fake percentages don't go beyond 100% */
+  if(browserUsers + change > 100 || browserUsers + change < 0) {
+    change *= -1;
+  } else if (iPhoneUsers - change > 100 || iPhoneUsers - change < 0) {
+    change *= -1;
+  }
   browserUsers += change;
-	iPhoneUsers -= change;
+  iPhoneUsers -= change;
   data = {"activeUsers": + activeUsers, 
-					"browserUsers": + browserUsers,
-					"iPhoneUsers": + iPhoneUsers,
-					"androidUsers": + androidUsers
-				 };
+          "browserUsers": + browserUsers,
+          "iPhoneUsers": + iPhoneUsers,
+          "androidUsers": + androidUsers
+         };
 }
 
 /* Create a function which will publish data to the channel */
@@ -57,12 +57,12 @@ var commands = ['grep', 'node', 'java', 'timer', '~/ls -l', 'netns', 'watchdog',
 
 /* Publishes log from server to client through Ably Realtime at different rate to publishData */
 function publishLog() {
-	var rnd = Math.round(Math.random()*2);
-	if (rnd==0) logData = ('starting process ' + commands[Math.round(Math.random()*(commands.length-1))])   
+  var rnd = Math.round(Math.random()*2);
+  if (rnd==0) logData = ('starting process ' + commands[Math.round(Math.random()*(commands.length-1))])   
   else if (rnd==1) logData = ('terminating server ' + servers[Math.round(Math.random()*(servers.length-1))])
-	else if (rnd==2) logData = ('avg. wait time ' + Math.random().toFixed(2))
+  else if (rnd==2) logData = ('avg. wait time ' + Math.random().toFixed(2))
 	
-	channel.publish("ServerLog", logData);
+  channel.publish("ServerLog", logData);
 }
 
 setInterval(publishLog, 1000);
@@ -71,13 +71,13 @@ setInterval(publishLog, 1000);
 /*
 channel.subscribe(function(msg) {
   var dataClient = JSON.parse(JSON.stringify(msg.data));
-	if (msg.name == "ServerData") {
-	  console.log("Recieved: " + dataClient.activeUsers);
-		console.log("Browser users: " + dataClient.browserUsers);
-		console.log("iPhone users: " + dataClient.iPhoneUsers);
-		console.log("Android users: " + dataClient.androidUsers);
-	} else if (msg.name == "ServerLog") {
-		console.log("Log: " + JSON.stringify(msg.data));
+  if (msg.name == "ServerData") {
+    console.log("Recieved: " + dataClient.activeUsers);
+    console.log("Browser users: " + dataClient.browserUsers);
+    console.log("iPhone users: " + dataClient.iPhoneUsers);
+    console.log("Android users: " + dataClient.androidUsers);
+  } else if (msg.name == "ServerLog") {
+    console.log("Log: " + JSON.stringify(msg.data));
   }
 });
 */
