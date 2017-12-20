@@ -13,24 +13,30 @@ var realtime = new Ably.Realtime({ key: ApiKey });
 /* Get a reference to the channel to use for site data */
 var channel = realtime.channels.get("SiteData");
 
-
-
 /* Create grid through blessed, adding line chart for active users */
-var grid = new contrib.grid({rows: 12, cols: 12, screen: screen})
-var activeUsersLine = grid.set(0, 0, 6, 6, contrib.line,
+var grid = new contrib.grid({rows: 13, cols: 13, screen: screen})
+var activeUsersLine = grid.set(0, 0, 8, 6, contrib.line,
   { label: 'Active Users',
 		wholeNumbersOnly : true
-})
+});
 
 /* Data structure for the active users line graph */
 var activeUsersData = {
   style: {line: 'red'},
   x : [],
   y : []
-}
+};
 
+
+/* Add gauge displaying platform being used by users to grid view */
+var platformUsersGauge = grid.set(9, 0, 4, 6, contrib.gauge,
+	{ label : "User Platform: Browser/iPhone/Android",
+		percent : [30, 35, 35], 
+		showLegend : true
+});
 /* Add active users to blessed screen element, add the data for the line, then render the screen */
 screen.append(activeUsersLine);
+screen.append(platformUsersGauge);
 activeUsersLine.setData([activeUsersData]);
 screen.render();
 
@@ -43,7 +49,7 @@ channel.subscribe(function(msg) {
 /* Add data to respective data structures */
   activeUsersData.y.push(activeUsers);
   activeUsersData.x.push(time.toString());
-
+  
 /* Cap number of data elements being shown */
 	if(activeUsersData.y.length >= 40) {
 		activeUsersData.y.shift();
@@ -52,6 +58,7 @@ channel.subscribe(function(msg) {
 
 /* Update data visualised on screen */
   activeUsersLine.setData([activeUsersData]);
+  platformUsersGauge.setData([data.browserUsers, data.iPhoneUsers, data.androidUsers]);
   screen.render();
 });
 
@@ -65,3 +72,7 @@ function getTime(timeS) {
 	var returnTime = h.substr(-2) + ':' + m.substr(-2) + ':' + s.substr(-2);
 	return returnTime;
 }
+
+screen.on('resize', function() {
+	activeUsersLine.emit('attach');
+});
