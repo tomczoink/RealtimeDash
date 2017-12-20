@@ -13,13 +13,13 @@ var realtime = new Ably.Realtime({ key: ApiKey });
 var channel = realtime.channels.get("SiteData");
 
 /* data contains all data to be sent to the client, activeUsers is one element of data */
-var data
-var activeUsers = Math.round(Math.random()*10000)
+var data;
+var activeUsers = Math.round(Math.random()*10);
 
 /* Get data into JSON format. Could try getting it from Google Analytics for example */
 function getData() {
-  activeUsers += Math.round((Math.random()*2-1)*10)
-  data = {"activeUsers":activeUsers.toString()}
+  activeUsers += Math.round((Math.random()*2-1));
+  data = {"activeUsers": + activeUsers.toString() };
 }
 
 /* Create a function which will publish data to the channel */
@@ -32,8 +32,11 @@ function publishData() {
 setInterval(publishData, 3000);
 
 /* Uncomment this to recieved messages in this code */
-/*
+/* 
 channel.subscribe(function(msg) {
-  console.log("Recieved: " + JSON.stringify(msg.data));
+  //var lol = JSON.parse(msg.data);
+  var dataClient = JSON.parse(JSON.stringify(msg.data));
+  console.log("Recieved: " + dataClient.activeUsers);
 });
 */
+
